@@ -1,0 +1,130 @@
+
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Uscita</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 28rem;
+        }
+        input[type="time"]::-webkit-calendar-picker-indicator,
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            filter: invert(1);
+        }
+        .input-group input {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="card p-8 w-full">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Calcolatore Uscita</h1>
+        <p class="text-center text-gray-500 mb-8">
+            Inserisci il tuo orario di arrivo e calcola l'orario di uscita in base a una giornata lavorativa di 8 ore e 30 minuti. Puoi anche inserire ore e minuti da scalare dalla tua banca ore.
+        </p>
+
+        <div class="space-y-6">
+            <!-- Campo per l'orario di arrivo -->
+            <div class="input-group flex flex-col">
+                <label for="arrival-time" class="text-gray-700 font-medium mb-2">Orario di Arrivo</label>
+                <input type="time" id="arrival-time" class="w-full text-lg">
+            </div>
+
+            <!-- Campi per la banca ore -->
+            <div class="input-group flex flex-col">
+                <label for="banca-ore" class="text-gray-700 font-medium mb-2">Banca Ore da Scalare</label>
+                <div class="flex space-x-4">
+                    <div class="flex-1">
+                        <input type="number" id="banca-ore-hours" placeholder="Ore" min="0" class="w-full text-center">
+                    </div>
+                    <div class="flex-1">
+                        <input type="number" id="banca-ore-minutes" placeholder="Minuti" min="0" max="59" class="w-full text-center">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Risultato -->
+            <div class="bg-blue-50 text-blue-700 p-6 rounded-lg text-center font-bold">
+                <p class="text-lg">Orario di Uscita Previsto</p>
+                <p id="exit-time" class="text-4xl mt-2">--:--</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const arrivalTimeInput = document.getElementById('arrival-time');
+            const bancaOreHoursInput = document.getElementById('banca-ore-hours');
+            const bancaOreMinutesInput = document.getElementById('banca-ore-minutes');
+            const exitTimeDisplay = document.getElementById('exit-time');
+            
+            // Funzione per aggiornare il calcolo
+            const calculateExitTime = () => {
+                // Ore lavorative base in minuti (8 ore e 30 minuti = 510 minuti)
+                const BASE_WORK_DURATION_MINUTES = 510;
+
+                const arrivalTimeValue = arrivalTimeInput.value;
+                const bancaOreHours = parseInt(bancaOreHoursInput.value) || 0;
+                const bancaOreMinutes = parseInt(bancaOreMinutesInput.value) || 0;
+
+                if (!arrivalTimeValue) {
+                    exitTimeDisplay.textContent = '--:--';
+                    return;
+                }
+
+                // Parse dell'orario di arrivo
+                const [arrivalHours, arrivalMinutes] = arrivalTimeValue.split(':').map(Number);
+                const arrivalTotalMinutes = arrivalHours * 60 + arrivalMinutes;
+
+                // Calcolo della banca ore da scalare
+                const bancaOreTotalMinutes = bancaOreHours * 60 + bancaOreMinutes;
+
+                // Durata lavorativa effettiva
+                const effectiveWorkDuration = BASE_WORK_DURATION_MINUTES - bancaOreTotalMinutes;
+
+                // Calcolo dell'orario di uscita in minuti
+                const exitTotalMinutes = arrivalTotalMinutes + effectiveWorkDuration;
+
+                // Conversione da minuti a HH:MM
+                const exitHours = Math.floor(exitTotalMinutes / 60) % 24;
+                const exitMinutes = exitTotalMinutes % 60;
+
+                // Formattazione per la visualizzazione
+                const formattedExitHours = String(exitHours).padStart(2, '0');
+                const formattedExitMinutes = String(exitMinutes).padStart(2, '0');
+
+                exitTimeDisplay.textContent = `${formattedExitHours}:${formattedExitMinutes}`;
+            };
+
+            // Aggiorna il calcolo a ogni modifica degli input
+            arrivalTimeInput.addEventListener('input', calculateExitTime);
+            bancaOreHoursInput.addEventListener('input', calculateExitTime);
+            bancaOreMinutesInput.addEventListener('input', calculateExitTime);
+            
+            // Esegui il calcolo iniziale se l'input di arrivo ha già un valore
+            calculateExitTime();
+        });
+    </script>
+</body>
+</html>
+
