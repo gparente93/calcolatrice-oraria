@@ -12,9 +12,10 @@
             background-color: #f1f5f9;
             -webkit-tap-highlight-color: transparent;
         }
+        /* Fix iOS input time background and color */
         input[type="time"] {
             color: #1e293b !important;
-            min-height: 1.5rem;
+            min-height: 2rem;
             background: transparent;
         }
         input::-webkit-outer-spin-button,
@@ -25,69 +26,89 @@
         .app-shadow {
             box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04);
         }
-        .active-ring {
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-5">
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-5">
+
+    <!-- Contenitore Toast (Modali minimali) -->
+    <div id="toast-container" class="fixed top-10 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-3 z-50 pointer-events-none"></div>
 
     <div class="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden app-shadow border border-blue-50">
         
+        <!-- Banner Superiore Orario Salvato -->
         <div id="saved-container" class="hidden bg-indigo-600 px-6 py-3 transition-all">
             <div class="flex justify-between items-center text-white">
                 <p class="text-xs font-semibold uppercase tracking-wider">
                     Uscita Memorizzata: <span id="saved-time-display" class="ml-1 text-sm font-bold">--:--</span>
                 </p>
-                <button id="clear-saved" class="text-[10px] bg-white/20 px-2 py-1 rounded-md font-bold uppercase hover:bg-white/30">Reset</button>
+                <button id="clear-saved" class="text-[10px] bg-white/20 px-2 py-1 rounded-md font-bold uppercase hover:bg-white/30 transition-colors">Reset</button>
             </div>
         </div>
 
-        <div class="p-8">
-            <h1 class="text-xl font-extrabold text-slate-800 mb-8 flex items-center justify-between">
-                <div class="flex items-center">
+        <div class="p-6 sm:p-8">
+            <header class="flex items-center justify-between mb-8">
+                <h1 class="text-xl font-extrabold text-slate-800 flex items-center">
                     <span class="bg-indigo-600 text-white p-2 rounded-lg mr-3 shadow-lg shadow-indigo-200">🕒</span>
                     TimeOut
+                </h1>
+                <!-- Indicatore stato Notifica -->
+                <div class="flex items-center space-x-2" title="Stato Notifiche">
+                    <span id="status-text" class="text-[10px] text-slate-400 font-bold uppercase">Notifiche Off</span>
+                    <span id="status-dot" class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>
                 </div>
-                <span id="status-dot" class="h-2 w-2 rounded-full bg-slate-300"></span>
-            </h1>
+            </header>
 
             <div class="space-y-6">
+                <!-- Ingresso -->
                 <div>
                     <label class="text-[11px] font-bold text-indigo-400 uppercase tracking-widest ml-1 mb-2 block">Orario di Ingresso</label>
-                    <div class="flex items-center bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-4 focus-within:border-indigo-500 focus-within:bg-white transition-all">
-                        <input type="time" id="arrival-time" class="w-full text-xl font-bold text-slate-700 outline-none">
+                    <div class="flex items-center bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 focus-within:border-indigo-500 focus-within:bg-white transition-all">
+                        <input type="time" id="arrival-time" class="w-full text-2xl font-bold text-slate-700 outline-none">
                     </div>
                 </div>
 
+                <!-- Banca Ore -->
                 <div>
                     <label class="text-[11px] font-bold text-indigo-400 uppercase tracking-widest ml-1 mb-2 block">Recupero Banca Ore</label>
                     <div class="flex space-x-3">
-                        <input type="number" id="banca-ore-hours" placeholder="Ore" 
-                               class="w-1/2 bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all">
-                        <input type="number" id="banca-ore-minutes" placeholder="Minuti" 
-                               class="w-1/2 bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all">
+                        <input type="number" id="banca-ore-hours" placeholder="Ore" min="0" 
+                               class="w-1/2 bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center text-lg font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all">
+                        <input type="number" id="banca-ore-minutes" placeholder="Min" min="0" max="59" 
+                               class="w-1/2 bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center text-lg font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all">
                     </div>
                 </div>
 
-                <div class="bg-indigo-50 border border-indigo-100 rounded-[2.5rem] p-8 text-center relative mt-4">
-                    <p class="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Fine turno prevista</p>
+                <!-- Risultato Finale (Risolto Layout) -->
+                <div class="bg-indigo-50 border border-indigo-100 rounded-[2rem] py-6 px-4 text-center relative mt-6">
+                    <p class="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Fine turno prevista</p>
                     
-                    <div class="flex items-center justify-center relative">
-                        <button id="notify-btn" class="hidden absolute left-[-15px] p-3 text-2xl hover:scale-110 active:scale-95 transition-all outline-none" title="Attiva Notifica">
-                            <span id="notify-icon">🔔</span>
-                        </button>
-
-                        <span id="exit-time" class="text-indigo-900 text-6xl font-[900] tracking-tighter">--:--</span>
+                    <!-- Griglia fissa a 3 colonne per mantenere il tempo sempre centrato -->
+                    <div class="grid grid-cols-3 items-center justify-items-center w-full">
                         
-                        <button id="save-btn" class="hidden absolute right-[-15px] p-3 text-2xl hover:scale-110 active:scale-95 transition-all outline-none" title="Salva">
-                            <span id="save-icon">💾</span>
-                        </button>
+                        <!-- Colonna Sinistra: Campanella -->
+                        <div class="justify-self-end pr-2 sm:pr-4">
+                            <button id="notify-btn" class="hidden p-2 text-2xl sm:text-3xl hover:scale-110 active:scale-90 transition-transform outline-none" title="Attiva Notifica">
+                                <span id="notify-icon">🔔</span>
+                            </button>
+                        </div>
+
+                        <!-- Colonna Centrale: Orario -->
+                        <div class="justify-self-center">
+                            <span id="exit-time" class="text-indigo-900 text-5xl sm:text-6xl font-black tracking-tighter">--:--</span>
+                        </div>
+                        
+                        <!-- Colonna Destra: Floppy -->
+                        <div class="justify-self-start pl-2 sm:pl-4">
+                            <button id="save-btn" class="hidden p-2 text-2xl sm:text-3xl hover:scale-110 active:scale-90 transition-transform outline-none" title="Salva in memoria">
+                                <span id="save-icon">💾</span>
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
 
-            <p class="text-center text-[10px] text-slate-300 font-bold mt-10 uppercase tracking-[0.3em]">Turno standard 8.5h</p>
+            <p class="text-center text-[10px] text-slate-300 font-bold mt-8 uppercase tracking-[0.3em]">Turno standard 8.5h</p>
         </div>
     </div>
 
@@ -105,9 +126,40 @@
                 savedContainer: document.getElementById('saved-container'),
                 savedDisplay: document.getElementById('saved-time-display'),
                 clearBtn: document.getElementById('clear-saved'),
-                statusDot: document.getElementById('status-dot')
-            };
+            statusDot: document.getElementById('status-dot'),
+            statusText: document.getElementById('status-text')
+        };
 
+        let isNotificationActive = false;
+        let checkInterval = null;
+        let notificationCount = 0;
+
+        // Sistema di Toast Notification (Minimal)
+        const showToast = (message, type = 'success') => {
+            const toast = document.createElement('div');
+            const bg = type === 'error' ? 'bg-red-500' : 'bg-slate-800';
+            toast.className = `${bg} text-white px-5 py-3 rounded-full shadow-xl text-sm font-medium transform transition-all duration-300 -translate-y-5 opacity-0 flex items-center space-x-2`;
+            
+            const icon = type === 'error' ? '❌' : (type === 'success' ? '✅' : '🔔');
+            toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+            
+            document.getElementById('toast-container').appendChild(toast);
+            
+            // Animazione in entrata
+            requestAnimationFrame(() => {
+                toast.classList.remove('-translate-y-5', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+            
+            // Rimuovi dopo 3 secondi
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-5', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
+        // Carica l'orario salvato all'avvio
             const updateUI = () => {
                 const saved = localStorage.getItem('work_exit_time');
                 if (saved) {
@@ -118,6 +170,7 @@
                 }
             };
 
+            // Calcolo dell'orario di uscita
             const calculate = () => {
                 const arrival = elements.arrival.value;
                 if (!arrival) {
@@ -131,61 +184,115 @@
                 const m = parseInt(elements.bM.value) || 0;
                 
                 const [arrH, arrM] = arrival.split(':').map(Number);
-                const totalMinutes = (arrH * 60 + arrM) + (510 - (h * 60 + m));
-                const normMinutes = (totalMinutes + 1440) % 1440;
+                const totalMinutes = (arrH * 60 + arrM) + (510 - (h * 60 + m)); // 510 min = 8.5 ore
+                const normMinutes = (totalMinutes + 1440) % 1440; // Gestione mezzanotte
 
                 const finalTime = `${String(Math.floor(normMinutes / 60)).padStart(2, '0')}:${String(normMinutes % 60).padStart(2, '0')}`;
                 
                 elements.exit.textContent = finalTime;
+                
+                // Mostra i bottoni solo quando c'è un risultato valido
                 elements.saveBtn.classList.remove('hidden');
                 elements.notifyBtn.classList.remove('hidden');
             };
 
-            // Logica Notifiche
-            elements.notifyBtn.addEventListener('click', async () => {
-                if (!("Notification" in window)) {
-                    alert("Questo browser non supporta le notifiche.");
-                    return;
-                }
+            // Avvia il loop di controllo per le notifiche
+        const startNotificationChecker = () => {
+            if (checkInterval) clearInterval(checkInterval);
+            notificationCount = 0; // Resetta il contatore all'avvio
+            
+            checkInterval = setInterval(() => {
+                if (!isNotificationActive) return;
 
-                let permission = Notification.permission;
-                if (permission !== "granted") {
-                    permission = await Notification.requestPermission();
+                const now = new Date();
+                const nowStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                
+                if (nowStr === elements.exit.textContent) {
+                    if (notificationCount < 3) {
+                        new Notification("TimeOut!", {
+                            body: "È ora di staccare! Buona serata! 🏃‍♂️",
+                            icon: "https://cdn-icons-png.flaticon.com/512/833/833539.png"
+                        });
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+                        
+                        notificationCount++;
+                    }
+                    
+                    // Disattiva dopo aver inviato 3 notifiche
+                    if (notificationCount >= 3) {
+                        isNotificationActive = false;
+                        updateNotificationUI();
+                        notificationCount = 0;
+                    }
                 }
+            }, 10000); // Controlla ogni 10 secondi per massima precisione
+        };
 
-                if (permission === "granted") {
+        const updateNotificationUI = () => {
+                if (isNotificationActive) {
                     elements.notifyIcon.textContent = '🔕';
                     elements.statusDot.classList.replace('bg-slate-300', 'bg-green-500');
-                    alert("Notifica attivata per le " + elements.exit.textContent + ". Tieni la scheda aperta o aggiungi alla Home.");
-                    
-                    // Controllo ogni 30 secondi
-                    setInterval(() => {
-                        const now = new Date();
-                        const nowStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                        if (nowStr === elements.exit.textContent) {
-                            new Notification("TimeOut!", {
-                                body: "È ora di staccare! Buona serata! 🏃‍♂️",
-                                icon: "https://cdn-icons-png.flaticon.com/512/833/833539.png"
-                            });
-                            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                        }
-                    }, 30000);
+                    elements.statusText.textContent = "Notifiche On";
+                    elements.statusText.classList.replace('text-slate-400', 'text-green-500');
+                } else {
+                    elements.notifyIcon.textContent = '🔔';
+                    elements.statusDot.classList.replace('bg-green-500', 'bg-slate-300');
+                    elements.statusText.textContent = "Notifiche Off";
+                    elements.statusText.classList.replace('text-green-500', 'text-slate-400');
                 }
-            });
+            };
 
-            elements.saveBtn.addEventListener('click', () => {
-                localStorage.setItem('work_exit_time', elements.exit.textContent);
-                updateUI();
-                elements.saveIcon.textContent = '✅';
-                setTimeout(() => elements.saveIcon.textContent = '💾', 1500);
-            });
+            // Gestione Click Campanella
+        elements.notifyBtn.addEventListener('click', async () => {
+            if (!("Notification" in window)) {
+                showToast("Il browser non supporta le notifiche.", "error");
+                return;
+            }
 
-            elements.clearBtn.addEventListener('click', () => {
-                localStorage.removeItem('work_exit_time');
-                updateUI();
-            });
+            if (isNotificationActive) {
+                // Spegni se già attiva
+                isNotificationActive = false;
+                updateNotificationUI();
+                showToast("Notifiche disattivate", "success");
+                return;
+            }
 
+            let permission = Notification.permission;
+            if (permission !== "granted") {
+                permission = await Notification.requestPermission();
+            }
+
+            if (permission === "granted") {
+                isNotificationActive = true;
+                updateNotificationUI();
+                startNotificationChecker();
+                
+                showToast(`Avviso impostato per le ${elements.exit.textContent}`);
+            } else {
+                showToast("Permessi notifiche negati.", "error");
+            }
+        });
+
+        // Gestione Click Floppy
+        elements.saveBtn.addEventListener('click', () => {
+            localStorage.setItem('work_exit_time', elements.exit.textContent);
+            updateUI();
+            elements.saveIcon.textContent = '✅';
+            showToast("Orario memorizzato!");
+            setTimeout(() => elements.saveIcon.textContent = '💾', 1500);
+        });
+
+        // Gestione Click Cancella Memoria
+        elements.clearBtn.addEventListener('click', () => {
+            localStorage.removeItem('work_exit_time');
+            updateUI();
+            showToast("Memoria azzerata");
+        });
+
+        // Ricalcola in tempo reale quando scrivi
             [elements.arrival, elements.bH, elements.bM].forEach(el => el.addEventListener('input', calculate));
+            
+            // Setup iniziale
             updateUI();
         });
     </script>
