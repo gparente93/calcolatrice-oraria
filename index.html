@@ -5,86 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calcolatore Uscita</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
             -webkit-tap-highlight-color: transparent;
         }
-        input { -webkit-appearance: none; appearance: none; }
-        .glass-card {
-            background: #ffffff;
-            border-radius: 2rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        /* Forza il colore dell'input time su iOS */
+        input[type="time"] {
+            color: #1e293b !important;
+            min-height: 1.5rem;
+            background: transparent;
         }
-        .input-focus-effect:focus-within {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        /* Nasconde le freccette standard degli input numerici */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .app-shadow {
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen p-5">
 
-    <div class="glass-card w-full max-w-md overflow-hidden border border-gray-100">
-        <div id="saved-container" class="hidden bg-blue-600 p-4 text-white">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <span class="text-xs font-medium uppercase tracking-wider opacity-80">Promemoria:</span>
-                    <span id="saved-time-display" class="text-lg font-bold">--:--</span>
-                </div>
-                <button id="clear-saved" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full text-xs transition-colors">Rimuovi</button>
+    <div class="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden app-shadow border border-blue-50">
+        
+        <div id="saved-container" class="hidden bg-indigo-600 px-6 py-3 transition-all">
+            <div class="flex justify-between items-center text-white">
+                <p class="text-xs font-semibold uppercase tracking-wider">
+                    Uscita fissata: <span id="saved-time-display" class="ml-1 text-sm font-bold">--:--</span>
+                </p>
+                <button id="clear-saved" class="text-[10px] bg-white/20 px-2 py-1 rounded-md font-bold uppercase">Reset</button>
             </div>
         </div>
 
         <div class="p-8">
-            <header class="mb-8 text-center">
-                <h1 class="text-2xl font-bold text-gray-800 tracking-tight">TimeOut</h1>
-                <p class="text-gray-400 text-sm">Calcola la fine del turno</p>
-            </header>
+            <h1 class="text-xl font-extrabold text-slate-800 mb-8 flex items-center">
+                <span class="bg-indigo-600 text-white p-2 rounded-lg mr-3">🕒</span>
+                Orario Lavoro
+            </h1>
 
-            <div class="space-y-8">
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-gray-400 uppercase ml-1">Ingresso</label>
-                    <div class="input-focus-effect flex items-center bg-gray-50 border border-gray-200 rounded-2xl p-4 transition-all">
-                        <span class="text-xl mr-3">🕒</span>
+            <div class="space-y-6">
+                <div class="relative group">
+                    <label class="text-[11px] font-bold text-indigo-400 uppercase tracking-widest ml-1 mb-2 block">Orario di Ingresso</label>
+                    <div class="flex items-center bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-4 focus-within:border-indigo-500 focus-within:bg-white transition-all">
                         <input type="time" id="arrival-time" 
-                               class="bg-transparent w-full text-xl font-semibold text-gray-700 focus:outline-none">
+                               class="w-full text-xl font-bold text-slate-700 outline-none">
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-gray-400 uppercase ml-1">Recupero Banca Ore</label>
+                <div>
+                    <label class="text-[11px] font-bold text-indigo-400 uppercase tracking-widest ml-1 mb-2 block">Recupero Banca Ore</label>
                     <div class="flex space-x-3">
-                        <input type="number" id="banca-ore-hours" placeholder="00 ore" 
-                               class="w-1/2 bg-gray-50 border border-gray-200 rounded-2xl p-4 text-center font-medium focus:outline-none focus:border-blue-400 transition-colors">
-                        <input type="number" id="banca-ore-minutes" placeholder="00 min" 
-                               class="w-1/2 bg-gray-50 border border-gray-200 rounded-2xl p-4 text-center font-medium focus:outline-none focus:border-blue-400 transition-colors">
+                        <input type="number" id="banca-ore-hours" placeholder="Ore" 
+                               class="w-1/2 bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all">
+                        <input type="number" id="banca-ore-minutes" placeholder="Minuti" 
+                               class="w-1/2 bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center font-bold text-slate-700 focus:border-indigo-500 focus:bg-white outline-none transition-all">
                     </div>
                 </div>
 
-                <div class="bg-slate-900 rounded-[2rem] p-8 text-center relative shadow-xl">
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mb-2">Uscita stimata</p>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-[2rem] p-8 text-center relative mt-4">
+                    <p class="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Fine turno prevista</p>
                     
-                    <div class="flex items-center justify-center space-x-4">
-                        <span id="exit-time" class="text-white text-6xl font-black tracking-tighter">--:--</span>
+                    <div class="flex items-center justify-center relative">
+                        <span id="exit-time" class="text-indigo-900 text-6xl font-black tracking-tighter">--:--</span>
                         
-                        <button id="save-btn" class="hidden text-3xl hover:scale-110 active:scale-90 transition-transform focus:outline-none" title="Memorizza">
+                        <button id="save-btn" class="hidden absolute right-[-10px] top-0 p-2 text-2xl hover:scale-110 active:scale-90 transition-transform" title="Salva">
                             <span id="save-icon">💾</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <p class="text-center text-[10px] text-gray-300 mt-10 uppercase tracking-widest font-bold">Turno standard: 8.5h</p>
+            <footer class="mt-8 text-center">
+                <p class="text-[10px] text-slate-300 font-medium uppercase tracking-widest">Configurato su 8 ore e 30 minuti</p>
+            </footer>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const arrivalInput = document.getElementById('arrival-time');
-            const hoursInput = document.getElementById('banca-ore-hours');
-            const minsInput = document.getElementById('banca-ore-minutes');
+            const hInput = document.getElementById('banca-ore-hours');
+            const mInput = document.getElementById('banca-ore-minutes');
             const exitDisplay = document.getElementById('exit-time');
             const saveBtn = document.getElementById('save-btn');
             const saveIcon = document.getElementById('save-icon');
@@ -92,8 +98,8 @@
             const savedTimeDisplay = document.getElementById('saved-time-display');
             const clearBtn = document.getElementById('clear-saved');
 
-            const checkSavedTime = () => {
-                const saved = localStorage.getItem('orarioUscita');
+            const updateUI = () => {
+                const saved = localStorage.getItem('work_exit_time');
                 if (saved) {
                     savedTimeDisplay.textContent = saved;
                     savedContainer.classList.remove('hidden');
@@ -102,47 +108,43 @@
                 }
             };
 
-            const calculateExitTime = () => {
-                const BASE_MINUTES = 510;
+            const calculate = () => {
                 const arrival = arrivalInput.value;
-                const bH = parseInt(hoursInput.value) || 0;
-                const bM = parseInt(minsInput.value) || 0;
-
                 if (!arrival) {
                     exitDisplay.textContent = '--:--';
                     saveBtn.classList.add('hidden');
                     return;
                 }
 
+                const bH = parseInt(hInput.value) || 0;
+                const bM = parseInt(mInput.value) || 0;
+                
+                // 8h 30m = 510 minuti
                 const [h, m] = arrival.split(':').map(Number);
-                const arrivalTotal = h * 60 + m;
-                const exitTotal = (arrivalTotal + (BASE_MINUTES - (bH * 60 + bM)) + 1440) % 1440;
+                const totalMinutes = (h * 60 + m) + (510 - (bH * 60 + bM));
+                const normalizedMinutes = (totalMinutes + 1440) % 1440;
 
-                const finalTime = `${String(Math.floor(exitTotal / 60)).padStart(2, '0')}:${String(exitTotal % 60).padStart(2, '0')}`;
-
-                exitDisplay.textContent = finalTime;
+                const resH = String(Math.floor(normalizedMinutes / 60)).padStart(2, '0');
+                const resM = String(normalizedMinutes % 60).padStart(2, '0');
+                
+                exitDisplay.textContent = `${resH}:${resM}`;
                 saveBtn.classList.remove('hidden');
             };
 
             saveBtn.addEventListener('click', () => {
-                localStorage.setItem('orarioUscita', exitDisplay.textContent);
-                checkSavedTime();
-                
-                // Animazione icona
+                localStorage.setItem('work_exit_time', exitDisplay.textContent);
+                updateUI();
                 saveIcon.textContent = '✅';
-                setTimeout(() => { saveIcon.textContent = '💾'; }, 1500);
+                setTimeout(() => saveIcon.textContent = '💾', 1500);
             });
 
             clearBtn.addEventListener('click', () => {
-                localStorage.removeItem('orarioUscita');
-                checkSavedTime();
+                localStorage.removeItem('work_exit_time');
+                updateUI();
             });
 
-            [arrivalInput, hoursInput, minsInput].forEach(el => 
-                el.addEventListener('input', calculateExitTime)
-            );
-
-            checkSavedTime();
+            [arrivalInput, hInput, mInput].forEach(el => el.addEventListener('input', calculate));
+            updateUI();
         });
     </script>
 </body>
